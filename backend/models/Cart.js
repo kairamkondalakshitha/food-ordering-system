@@ -1,64 +1,15 @@
-const express = require("express");
-const router = express.Router();
+const mongoose=require("mongoose");
 
-const Cart = require("../models/Cart");
+const cartSchema=new mongoose.Schema({
+    customer:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User"
+    },
+    food:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Food"
+    },
+    quantity:Number
+},{timestamps:true});
 
-// Get Cart Items
-router.get("/", async (req, res) => {
-    try {
-        const cart = await Cart.find().populate("food");
-
-        res.json(cart);
-
-    } catch (error) {
-
-        res.status(500).json({
-            message: error.message
-        });
-
-    }
-});
-
-// Add Item to Cart
-router.post("/", async (req, res) => {
-
-    try {
-
-        const cart = new Cart(req.body);
-
-        await cart.save();
-
-        res.status(201).json(cart);
-
-    } catch (error) {
-
-        res.status(500).json({
-            message: error.message
-        });
-
-    }
-
-});
-
-// Delete Cart Item
-router.delete("/:id", async (req, res) => {
-
-    try {
-
-        await Cart.findByIdAndDelete(req.params.id);
-
-        res.json({
-            message: "Item Removed"
-        });
-
-    } catch (error) {
-
-        res.status(500).json({
-            message: error.message
-        });
-
-    }
-
-});
-
-module.exports = router;
+module.exports=mongoose.model("Cart",cartSchema);

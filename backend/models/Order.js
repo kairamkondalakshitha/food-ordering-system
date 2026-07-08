@@ -1,73 +1,20 @@
-const express = require("express");
-const router = express.Router();
+const mongoose=require("mongoose");
 
-const Order = require("../models/Order");
-
-// Get All Orders
-router.get("/", async (req, res) => {
-
-    try {
-
-        const orders = await Order.find();
-
-        res.json(orders);
-
-    } catch (error) {
-
-        res.status(500).json({
-            message: error.message
-        });
-
+const orderSchema=new mongoose.Schema({
+    customer:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User"
+    },
+    restaurant:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Restaurant"
+    },
+    items:Array,
+    total:Number,
+    status:{
+        type:String,
+        default:"Pending"
     }
+},{timestamps:true});
 
-});
-
-// Place Order
-router.post("/", async (req, res) => {
-
-    try {
-
-        const order = new Order(req.body);
-
-        await order.save();
-
-        res.status(201).json(order);
-
-    } catch (error) {
-
-        res.status(500).json({
-            message: error.message
-        });
-
-    }
-
-});
-
-// Update Order Status
-router.put("/:id/status", async (req, res) => {
-
-    try {
-
-        const order = await Order.findByIdAndUpdate(
-            req.params.id,
-            {
-                status: req.body.status
-            },
-            {
-                new: true
-            }
-        );
-
-        res.json(order);
-
-    } catch (error) {
-
-        res.status(500).json({
-            message: error.message
-        });
-
-    }
-
-});
-
-module.exports = router;
+module.exports=mongoose.model("Order",orderSchema);
